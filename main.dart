@@ -9,27 +9,26 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: const SearchBarPage(),
+    return const MaterialApp(
+      home: MainAppPage(),
     );
   }
 }
 
-class SearchBarPage extends StatefulWidget {
-  const SearchBarPage({super.key});
+class MainAppPage extends StatefulWidget {
+  const MainAppPage({super.key});
 
   @override
-  State<SearchBarPage> createState() => _SearchBarPageState();
+  State<MainAppPage> createState() => _MainAppPageState();
 }
 
-class _SearchBarPageState extends State<SearchBarPage> {
-  String _searchQuery = "";
+class _MainAppPageState extends State<MainAppPage> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [
-    const SearchBarPageContent(), // Home Page
-    const PlaceholderPage(title: "Wallet Page"), // Wallet Page
-    const PlaceholderPage(title: "Profile Page"), // Profile Page
+    const HomePage(),
+    const MessagingPage(),
+    const ProfilePage(),
   ];
 
   void _onItemTapped(int index) {
@@ -43,48 +42,7 @@ class _SearchBarPageState extends State<SearchBarPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.green,
-        elevation: 0,
-        title: Container(
-          height: 50,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(25),
-          ),
-          child: Row(
-            children: [
-              const SizedBox(width: 10),
-              const Icon(Icons.search, color: Colors.grey),
-              const SizedBox(width: 10),
-              Expanded(
-                child: TextField(
-                  decoration: const InputDecoration(
-                    hintText: "Search the app",
-                    hintStyle: TextStyle(color: Colors.grey),
-                    border: InputBorder.none,
-                  ),
-                  onChanged: (query) {
-                    setState(() {
-                      _searchQuery = query;
-                    });
-                  },
-                ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.favorite, color: Colors.grey),
-                onPressed: () {
-                  // Placeholder for favorite functionality
-                  showDialog(
-                    context: context,
-                    builder: (context) => const AlertDialog(
-                      title: Text("Favorites"),
-                      content: Text("Favorite functionality not implemented."),
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
+        title: const Text("My App"),
       ),
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
@@ -94,8 +52,8 @@ class _SearchBarPageState extends State<SearchBarPage> {
             label: "Home",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.wallet),
-            label: "Wallet",
+            icon: Icon(Icons.message),
+            label: "Messaging",
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
@@ -110,30 +68,31 @@ class _SearchBarPageState extends State<SearchBarPage> {
   }
 }
 
-class SearchBarPageContent extends StatelessWidget {
-  const SearchBarPageContent({super.key});
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const SizedBox(height: 10),
+        const Padding(
+          padding: EdgeInsets.all(16.0),
+          child: CustomSearchBar(),
+        ),
         Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            _buildIconButton(
-              label: "Transport",
+            _buildFeatureWidget(
+              context,
               icon: Icons.directions_car,
-              onTap: () {
-                // Placeholder for Transport functionality
-                showDialog(
-                  context: context,
-                  builder: (context) => const AlertDialog(
-                    title: Text("Transport"),
-                    content: Text("Transport functionality not implemented."),
-                  ),
-                );
-              },
+              label: "Transport",
+              description: "Transport functionality not implemented yet.",
+            ),
+            _buildFeatureWidget(
+              context,
+              icon: Icons.account_balance_wallet,
+              label: "Wallet",
+              description: "Wallet functionality not implemented yet.",
             ),
           ],
         ),
@@ -141,41 +100,177 @@ class SearchBarPageContent extends StatelessWidget {
     );
   }
 
-  Widget _buildIconButton({required String label, required IconData icon, required VoidCallback onTap}) {
+  Widget _buildFeatureWidget(BuildContext context,
+      {required IconData icon,
+      required String label,
+      required String description}) {
     return Column(
       children: [
         GestureDetector(
-          onTap: onTap,
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.green.shade100,
-              shape: BoxShape.circle,
-            ),
-            padding: const EdgeInsets.all(15),
+          onTap: () {
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: Text(label),
+                content: Text(description),
+              ),
+            );
+          },
+          child: CircleAvatar(
+            radius: 30,
+            backgroundColor: Colors.green.withOpacity(0.1),
             child: Icon(icon, size: 30, color: Colors.green),
           ),
         ),
-        const SizedBox(height: 5),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-        ),
+        const SizedBox(height: 8),
+        Text(label),
       ],
     );
   }
 }
 
-class PlaceholderPage extends StatelessWidget {
-  final String title;
-  const PlaceholderPage({super.key, required this.title});
+class CustomSearchBar extends StatelessWidget {
+  const CustomSearchBar({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        title,
-        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          IconButton(
+            icon: const Icon(Icons.qr_code_scanner, color: Colors.black54),
+            onPressed: () {},
+          ),
+          const Expanded(
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: "Search the Grab app",
+                border: InputBorder.none,
+              ),
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.favorite_border, color: Colors.black54),
+            onPressed: () {},
+          ),
+        ],
       ),
     );
   }
 }
+
+class MessagingPage extends StatelessWidget {
+  const MessagingPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(
+            Icons.message,
+            size: 100,
+            color: Colors.green,
+          ),
+          const SizedBox(height: 20),
+          const Text(
+            "Messaging Page",
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 20),
+          const Text(
+            "Here you can chat with your contacts.",
+            style: TextStyle(fontSize: 16),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => const AlertDialog(
+                  title: Text("Start Chat"),
+                  content: Text("Chat functionality not implemented yet."),
+                ),
+              );
+            },
+            child: const Text("Start a Chat"),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ProfilePage extends StatelessWidget {
+  const ProfilePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(
+            Icons.person,
+            size: 100,
+            color: Colors.green,
+          ),
+          const SizedBox(height: 20),
+          const Text(
+            "Profile Page",
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 20),
+          const Text(
+            "View and edit your profile information here.",
+            style: TextStyle(fontSize: 16),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text("Edit Profile"),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      TextField(
+                        decoration: InputDecoration(
+                          labelText: "Name",
+                        ),
+                      ),
+                      TextField(
+                        decoration: InputDecoration(
+                          labelText: "Email",
+                        ),
+                      ),
+                    ],
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text("Save"),
+                    ),
+                  ],
+                ),
+              );
+            },
+            child: const Text("Edit Profile"),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
